@@ -1,0 +1,34 @@
+# Render Blueprint — déploiement de l'API Clozy
+# Render → New + → Blueprint → sélectionner ce repo. Render lira ce fichier.
+# Les variables `sync: false` doivent être renseignées dans le dashboard
+# (ce sont des secrets, jamais commités).
+services:
+  - type: web
+    name: clozy-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # PORT est fourni automatiquement par Render (le code lit process.env.PORT)
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
