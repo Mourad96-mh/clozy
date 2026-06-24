@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart, buildWhatsappLink } from "../context/CartContext";
 import { api } from "../api";
 import { SITE } from "../data/config";
+import Seo from "../components/Seo";
+import Img from "../components/Img";
 
 export default function Checkout() {
   const { items, subtotal, shipping, total, clear } = useCart();
@@ -93,6 +95,7 @@ export default function Checkout() {
 
   return (
     <div className="container section checkout">
+      <Seo title="Finaliser ma commande | Vêtements Hiba" noindex />
       <h1 className="page-title">Finaliser ma commande</h1>
       <div className="checkout__grid">
         <form className="checkout__form" onSubmit={submit}>
@@ -132,7 +135,7 @@ export default function Checkout() {
           <h2>Récapitulatif</h2>
           {items.map((i) => (
             <div className="checkout__line" key={i.key}>
-              <img src={i.image || "/placeholder.svg"} alt={i.name} />
+              <Img src={i.image || "/placeholder.svg"} alt={i.name} cdnWidth={120} />
               <div>
                 <p>{i.name}</p>
                 <span className="muted">

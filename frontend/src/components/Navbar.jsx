@@ -22,8 +22,8 @@ export default function Navbar({ onCartClick }) {
           ☰
         </button>
 
-        <Link to="/" className="navbar__logo">
-          {SITE.name}
+        <Link to="/" className="navbar__logo" aria-label={SITE.name}>
+          <img src="/logo.jpeg" alt={SITE.name} className="navbar__logo-img" />
         </Link>
 
         <nav className={`navbar__nav ${mobileOpen ? "is-open" : ""}`}>
@@ -40,7 +40,7 @@ export default function Navbar({ onCartClick }) {
                 {cat.subcategories.map((sub) => (
                   <Link
                     key={sub.slug}
-                    to={`/categorie/${cat.slug}?sub=${sub.slug}`}
+                    to={`/categorie/${cat.slug}/${sub.slug}`}
                     onClick={() => setMobileOpen(false)}
                   >
                     {sub.name}

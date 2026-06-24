@@ -2,6 +2,7 @@
 const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function authHeaders() {
+  if (typeof window === "undefined") return {};
   const token = localStorage.getItem("boutique-token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 }

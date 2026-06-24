@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { SITE } from "../../data/config";
+import Seo from "../../components/Seo";
 import "../../styles/admin.css";
 
 export default function AdminLogin() {
@@ -28,6 +29,7 @@ export default function AdminLogin() {
 
   return (
     <div className="admin-login">
+      <Seo title="Connexion Admin | Vêtements Hiba" noindex />
       <form className="admin-login__card" onSubmit={submit}>
         <h1>{SITE.name} · Administration</h1>
         <p className="muted">Connectez-vous pour gérer la boutique.</p>

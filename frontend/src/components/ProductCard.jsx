@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { finalPrice } from "../api";
 import { SITE } from "../data/config";
+import Img from "./Img";
 
 export default function ProductCard({ product }) {
   const price = finalPrice(product);
@@ -9,7 +10,7 @@ export default function ProductCard({ product }) {
   return (
     <Link to={`/produit/${product.slug || product._id}`} className="card">
       <div className="card__media">
-        <img src={img} alt={product.name} loading="lazy" />
+        <Img src={img} alt={product.name} cdnWidth={500} />
         {product.discount > 0 && (
           <span className="card__badge card__badge--sale">-{product.discount}%</span>
         )}

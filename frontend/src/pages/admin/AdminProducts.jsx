@@ -8,6 +8,7 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // null | "new" | product
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all"); // all | no-sizes | no-colors | incomplete
 
   const load = () => {
     setLoading(true);
@@ -25,9 +26,20 @@ export default function AdminProducts() {
     load();
   };
 
-  const filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const noSizes = (p) => !p.sizes?.length;
+  const noColors = (p) => !p.colors?.length;
+
+  const filtered = products.filter((p) => {
+    if (!p.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filter === "no-sizes") return noSizes(p);
+    if (filter === "no-colors") return noColors(p);
+    if (filter === "incomplete") return noSizes(p) || noColors(p);
+    return true;
+  });
+
+  const incompleteCount = products.filter(
+    (p) => noSizes(p) || noColors(p)
+  ).length;
 
   return (
     <div>
@@ -38,12 +50,34 @@ export default function AdminProducts() {
         </button>
       </div>
 
-      <input
-        className="admin__search"
-        placeholder="Rechercher un produit…"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="admin__filters">
+        <input
+          className="admin__search"
+          placeholder="Rechercher un produit…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select
+          className="admin__filter-select"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        >
+          <option value="all">Tous les produits</option>
+          <option value="incomplete">⚠️ Incomplets (taille ou couleur manquante)</option>
+          <option value="no-sizes">Sans tailles</option>
+          <option value="no-colors">Sans couleurs</option>
+        </select>
+        {incompleteCount > 0 && filter === "all" && (
+          <button
+            type="button"
+            className="admin__filter-badge"
+            onClick={() => setFilter("incomplete")}
+            title="Afficher les produits incomplets"
+          >
+            {incompleteCount} incomplet{incompleteCount > 1 ? "s" : ""}
+          </button>
+        )}
+      </div>
 
       {loading ? (
         <p className="muted">Chargement…</p>
@@ -55,6 +89,7 @@ export default function AdminProducts() {
                 <th></th>
                 <th>Nom</th>
                 <th>Catégorie</th>
+                <th>Tailles / Couleurs</th>
                 <th>Prix</th>
                 <th>Stock</th>
                 <th></th>
@@ -74,6 +109,26 @@ export default function AdminProducts() {
                   <td>
                     {p.category}
                     {p.subcategory ? ` · ${p.subcategory}` : ""}
+                  </td>
+                  <td>
+                    <div className="cell-tags">
+                      {p.sizes?.length ? (
+                        p.sizes.map((s) => (
+                          <span key={s} className="cell-chip cell-chip--size">{s}</span>
+                        ))
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </div>
+                    <div className="cell-tags">
+                      {p.colors?.length ? (
+                        p.colors.map((c) => (
+                          <span key={c} className="cell-chip cell-chip--color">{c}</span>
+                        ))
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </div>
                   </td>
                   <td>
                     {finalPrice(p)} {SITE.currency}
@@ -98,7 +153,7 @@ export default function AdminProducts() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="muted" style={{ textAlign: "center" }}>
+                  <td colSpan={7} className="muted" style={{ textAlign: "center" }}>
                     Aucun produit.
                   </td>
                 </tr>

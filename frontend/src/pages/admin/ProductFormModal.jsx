@@ -2,6 +2,70 @@ import { useState } from "react";
 import { api } from "../../api";
 import { CATEGORIES } from "../../data/products";
 
+// Éditeur de "tags" (tailles / couleurs) : presets cliquables + ajout/suppression.
+function TagEditor({ label, value, onChange, presets = [], placeholder }) {
+  const [input, setInput] = useState("");
+
+  const add = (raw) => {
+    const v = String(raw).trim();
+    if (!v) return;
+    if (!value.includes(v)) onChange([...value, v]);
+    setInput("");
+  };
+  const remove = (t) => onChange(value.filter((x) => x !== t));
+
+  return (
+    <div className="tag-field">
+      <span className="tag-field__label">{label}</span>
+
+      {presets.length > 0 && (
+        <div className="tag-presets">
+          {presets.map((p) => (
+            <button
+              type="button"
+              key={p}
+              className={`tag-preset ${value.includes(p) ? "is-on" : ""}`}
+              onClick={() => (value.includes(p) ? remove(p) : add(p))}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="tag-input">
+        <input
+          value={input}
+          placeholder={placeholder}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add(input);
+            }
+          }}
+        />
+        <button type="button" className="btn btn--outline" onClick={() => add(input)}>
+          Ajouter
+        </button>
+      </div>
+
+      {value.length > 0 && (
+        <div className="tag-chips">
+          {value.map((t) => (
+            <span className="chip" key={t}>
+              {t}
+              <button type="button" onClick={() => remove(t)} aria-label={`Retirer ${t}`}>
+                ✕
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const empty = {
   name: "",
   description: "",
@@ -152,28 +216,20 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
             </label>
           </div>
 
-          <div className="form-row">
-            <label>
-              Tailles (séparées par des virgules)
-              <input
-                value={form.sizes.join(", ")}
-                onChange={(e) =>
-                  set("sizes", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))
-                }
-                placeholder="S, M, L, XL"
-              />
-            </label>
-            <label>
-              Couleurs (séparées par des virgules)
-              <input
-                value={form.colors.join(", ")}
-                onChange={(e) =>
-                  set("colors", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))
-                }
-                placeholder="Rose, Bleu"
-              />
-            </label>
-          </div>
+          <TagEditor
+            label="Tailles"
+            value={form.sizes}
+            onChange={(v) => set("sizes", v)}
+            presets={["S", "M", "L", "XL", "XXL", "2XL", "3XL", "4XL"]}
+            placeholder="Ajouter une taille…"
+          />
+
+          <TagEditor
+            label="Couleurs"
+            value={form.colors}
+            onChange={(v) => set("colors", v)}
+            placeholder="Ajouter une couleur (ex : Rose) puis Entrée"
+          />
 
           {/* Images */}
           <label>Images</label>

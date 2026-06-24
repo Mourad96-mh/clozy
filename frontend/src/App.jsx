@@ -1,14 +1,11 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { Navigate } from "react-router-dom";
 
-import Navbar from "./components/Navbar.jsx";
-import Footer from "./components/Footer.jsx";
-import CartDrawer from "./components/CartDrawer.jsx";
-import ScrollToTop from "./components/ScrollToTop.jsx";
+import Root from "./layouts/Root.jsx";
+import StorefrontLayout from "./layouts/StorefrontLayout.jsx";
 
 import Home from "./pages/Home.jsx";
-import Category from "./pages/Category.jsx";
-import ProductDetail from "./pages/ProductDetail.jsx";
+import Category, { categoryLoader } from "./pages/Category.jsx";
+import ProductDetail, { productLoader } from "./pages/ProductDetail.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
@@ -19,50 +16,43 @@ import AdminProducts from "./pages/admin/AdminProducts.jsx";
 import AdminOrders from "./pages/admin/AdminOrders.jsx";
 import AdminSettings from "./pages/admin/AdminSettings.jsx";
 
-function Storefront() {
-  const [cartOpen, setCartOpen] = useState(false);
-  return (
-    <>
-      <Navbar onCartClick={() => setCartOpen(true)} />
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/categorie/:slug" element={<Category />} />
-          <Route path="/produit/:idOrSlug" element={<ProductDetail />} />
-          <Route path="/commande" element={<Checkout />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
-    </>
-  );
-}
+// Routes au format objet (data router) consommées par vite-react-ssg pour le
+// prerender. La boutique est prérendue en HTML statique ; /admin/* reste en
+// client-only (exclu du prerender via ssgOptions.includedRoutes dans vite.config).
+export const routes = [
+  {
+    path: "/",
+    element: <Root />,
+    children: [
+      {
+        element: <StorefrontLayout />,
+        children: [
+          { index: true, element: <Home /> },
+          { path: "categorie/:slug", element: <Category />, loader: categoryLoader },
+          { path: "categorie/:slug/:sub", element: <Category />, loader: categoryLoader },
+          { path: "produit/:idOrSlug", element: <ProductDetail />, loader: productLoader },
+          { path: "commande", element: <Checkout /> },
+        ],
+      },
 
-export default function App() {
-  return (
-    <>
-      <ScrollToTop />
-      <Routes>
-        {/* ── Admin ───────────────────────────────────────── */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="/admin/produits" replace />} />
-          <Route path="produits" element={<AdminProducts />} />
-          <Route path="commandes" element={<AdminOrders />} />
-          <Route path="parametres" element={<AdminSettings />} />
-        </Route>
+      // ── Admin (client-only, noindex) ─────────────────────────
+      { path: "admin/login", element: <AdminLogin /> },
+      {
+        path: "admin",
+        element: (
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          { index: true, element: <Navigate to="/admin/produits" replace /> },
+          { path: "produits", element: <AdminProducts /> },
+          { path: "commandes", element: <AdminOrders /> },
+          { path: "parametres", element: <AdminSettings /> },
+        ],
+      },
 
-        {/* ── Boutique (tout le reste) ────────────────────── */}
-        <Route path="/*" element={<Storefront />} />
-      </Routes>
-    </>
-  );
-}
+      { path: "*", element: <NotFound /> },
+    ],
+  },
+];

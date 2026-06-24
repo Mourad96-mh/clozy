@@ -4,6 +4,35 @@ import { api } from "../api";
 import { CATEGORIES } from "../data/products";
 import { SITE } from "../data/config";
 import ProductCard from "../components/ProductCard";
+import Seo from "../components/Seo";
+
+const businessLd = {
+  "@context": "https://schema.org",
+  "@type": "ClothingStore",
+  name: SITE.name,
+  url: SITE.origin,
+  image: `${SITE.origin}/og-image.jpg`,
+  logo: `${SITE.origin}/logo.jpeg`,
+  email: SITE.email,
+  telephone: `+${SITE.whatsapp}`,
+  sameAs: [SITE.instagram],
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Casablanca",
+    addressCountry: "MA",
+  },
+  areaServed: "MA",
+  currenciesAccepted: "MAD",
+  paymentAccepted: "Paiement à la livraison",
+};
+
+const websiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  url: SITE.origin,
+  inLanguage: "fr-MA",
+};
 
 export default function Home() {
   const [featured, setFeatured] = useState([]);
@@ -25,12 +54,21 @@ export default function Home() {
 
   return (
     <>
+      <Seo
+        title="Vêtements Hiba — Pyjamas & homewear au Maroc"
+        description="Vêtements Hiba : pyjamas, sous-vêtements, homewear et burkini pour femme, homme et enfant. Livraison partout au Maroc, paiement à la livraison."
+        path="/"
+      >
+        <script type="application/ld+json">{JSON.stringify(businessLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(websiteLd)}</script>
+      </Seo>
+
       {/* Hero */}
       <section className="hero">
         <div className="container hero__inner">
           <div className="hero__text">
             <p className="hero__eyebrow">{SITE.tagline}</p>
-            <h1>Le confort, jour et nuit.</h1>
+            <h1>Pyjamas, sous-vêtements &amp; homewear pour femme au Maroc</h1>
             <p className="hero__sub">
               Pyjamas, sous-vêtements et homewear pour toute la famille.
               Livraison partout au Maroc, paiement à la livraison.

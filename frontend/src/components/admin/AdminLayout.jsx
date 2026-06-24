@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { SITE } from "../../data/config";
+import Seo from "../Seo";
 import "../../styles/admin.css";
 
 export default function AdminLayout() {
@@ -14,6 +15,8 @@ export default function AdminLayout() {
 
   return (
     <div className="admin">
+      <Seo title="Admin | Vêtements Hiba" noindex />
+
       <aside className="admin__sidebar">
         <div className="admin__brand">{SITE.name} · Admin</div>
         <nav className="admin__nav">

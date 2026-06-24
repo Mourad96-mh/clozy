@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { SITE } from "../data/config";
+import Img from "./Img";
 
 export default function CartDrawer({ open, onClose }) {
   const { items, subtotal, shipping, total, count, setQty, remove } = useCart();
@@ -32,7 +33,7 @@ export default function CartDrawer({ open, onClose }) {
             <div className="drawer__items">
               {items.map((i) => (
                 <div className="drawer__item" key={i.key}>
-                  <img src={i.image || "/placeholder.svg"} alt={i.name} />
+                  <Img src={i.image || "/placeholder.svg"} alt={i.name} cdnWidth={120} />
                   <div className="drawer__item-info">
                     <p className="drawer__item-name">{i.name}</p>
                     <p className="drawer__item-opts">

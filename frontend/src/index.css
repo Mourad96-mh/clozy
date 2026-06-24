@@ -59,7 +59,8 @@ h1, h2, h3, h4 { line-height: 1.2; }
 .navbar__top p { margin: 0; }
 .navbar__main { display: flex; align-items: center; gap: 24px; height: 68px; }
 .navbar__burger { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-.navbar__logo { font-size: 1.5rem; font-weight: 800; color: var(--brand); letter-spacing: 0.5px; }
+.navbar__logo { display: flex; align-items: center; }
+.navbar__logo-img { height: 54px; width: auto; display: block; }
 .navbar__nav { display: flex; gap: 4px; margin-left: auto; }
 .navbar__item { position: relative; }
 .navbar__link { display: block; padding: 22px 16px; font-weight: 600; }
@@ -212,6 +213,7 @@ h1, h2, h3, h4 { line-height: 1.2; }
 .footer { background: #1b1b1b; color: #d6d6d6; margin-top: 48px; }
 .footer__grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 28px; padding: 48px 20px; }
 .footer__logo { color: #fff; font-size: 1.4rem; margin: 0 0 8px; }
+.footer__logo-img { width: 110px; height: 110px; border-radius: 50%; display: block; margin: 0 0 12px; }
 .footer h4 { color: #fff; margin: 0 0 14px; font-size: 1rem; }
 .footer ul { list-style: none; padding: 0; margin: 0; }
 .footer li { padding: 5px 0; font-size: 0.9rem; }
@@ -247,3 +249,19 @@ h1, h2, h3, h4 { line-height: 1.2; }
   .pdp__grid { grid-template-columns: 1fr; }
   .checkout__grid { grid-template-columns: 1fr; }
 }
+
+/* ── Contenu SEO catégorie (intro + FAQ) ───────────────────── */
+.cat-intro {
+  max-width: 70ch;
+  margin: 8px 0 24px;
+  color: var(--muted, #555);
+  line-height: 1.7;
+}
+.cat-faq { margin-top: 40px; }
+.faq-list { margin: 0; }
+.faq-item { border-top: 1px solid var(--line, #eee); padding: 16px 0; }
+.faq-item dt { font-weight: 600; margin-bottom: 6px; }
+.faq-item dd { margin: 0; color: var(--muted, #555); line-height: 1.6; }
+
+/* <picture> ne doit pas créer de boîte : l'<img> garde la mise en page d'origine */
+picture { display: contents; }

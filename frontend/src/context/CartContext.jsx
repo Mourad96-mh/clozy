@@ -6,6 +6,8 @@ const CartContext = createContext(null);
 const STORAGE_KEY = "boutique-cart";
 
 function loadInitial() {
+  // Rendu côté serveur (prerender SSG) : pas de localStorage → panier vide.
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];

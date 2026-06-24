@@ -5,7 +5,9 @@ const AuthContext = createContext(null);
 const TOKEN_KEY = "boutique-token";
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY));
+  const [token, setToken] = useState(() =>
+    typeof window === "undefined" ? null : localStorage.getItem(TOKEN_KEY)
+  );
 
   const login = async (email, password) => {
     const { token } = await api.login({ email, password });

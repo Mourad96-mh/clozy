@@ -1,39 +1,40 @@
-import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLoaderData } from "react-router-dom";
 import { api, finalPrice } from "../api";
 import { SITE } from "../data/config";
+import { getCategory } from "../data/products";
 import { useCart } from "../context/CartContext";
+import Seo from "../components/Seo";
+import Img from "../components/Img";
+
+// Chargé au build (prerender) ET à la navigation client : les données produit
+// sont donc présentes dans le HTML statique.
+export async function productLoader({ params }) {
+  try {
+    return await api.getProduct(params.idOrSlug);
+  } catch {
+    return null;
+  }
+}
 
 export default function ProductDetail() {
-  const { idOrSlug } = useParams();
-  const navigate = useNavigate();
+  const product = useLoaderData();
   const { add } = useCart();
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [activeImg, setActiveImg] = useState(0);
-  const [size, setSize] = useState("");
-  const [color, setColor] = useState("");
+  const [size, setSize] = useState(product?.sizes?.[0] || "");
+  const [color, setColor] = useState(product?.colors?.[0] || "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    api
-      .getProduct(idOrSlug)
-      .then((p) => {
-        setProduct(p);
-        setSize(p.sizes?.[0] || "");
-        setColor(p.colors?.[0] || "");
-      })
-      .catch(() => setProduct(null))
-      .finally(() => setLoading(false));
-  }, [idOrSlug]);
-
-  if (loading) return <div className="container section"><p className="muted">Chargement…</p></div>;
   if (!product)
     return (
       <div className="container section">
+        <Seo
+          title="Produit introuvable | Vêtements Hiba"
+          description="Ce produit n'est plus disponible."
+          noindex
+        />
         <h1>Produit introuvable</h1>
         <Link to="/" className="btn btn--outline">Retour à l'accueil</Link>
       </div>
@@ -41,28 +42,86 @@ export default function ProductDetail() {
 
   const price = finalPrice(product);
   const images = product.images?.length ? product.images : ["/placeholder.svg"];
+  const category = getCategory(product.category);
+  const categoryName = category?.name || product.category;
+  const path = `/produit/${product.slug || product._id}`;
+  const absImages = images.map((src) =>
+    src.startsWith("http") ? src : SITE.origin + src
+  );
+
+  const description =
+    product.description ||
+    `${product.name} — ${categoryName} disponible chez Vêtements Hiba. Livraison partout au Maroc, paiement à la livraison.`;
+
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: absImages,
+    description,
+    sku: product.slug || product._id,
+    brand: { "@type": "Brand", name: SITE.name },
+    offers: {
+      "@type": "Offer",
+      url: SITE.origin + path,
+      priceCurrency: "MAD",
+      price: String(price),
+      availability: product.inStock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: SITE.origin + "/" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: categoryName,
+        item: `${SITE.origin}/categorie/${product.category}`,
+      },
+      { "@type": "ListItem", position: 3, name: product.name, item: SITE.origin + path },
+    ],
+  };
 
   const handleAdd = () => {
-    add(
-      { ...product, price, image: images[0] },
-      { size, color, qty }
-    );
+    add({ ...product, price, image: images[0] }, { size, color, qty });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
 
   return (
     <div className="container section pdp">
+      <Seo
+        title={`${product.name} — ${categoryName} | Vêtements Hiba`}
+        description={description.slice(0, 155)}
+        path={path}
+        image={absImages[0]}
+        type="product"
+      >
+        <script type="application/ld+json">{JSON.stringify(productLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbLd)}</script>
+      </Seo>
+
       <nav className="crumbs">
         <Link to="/">Accueil</Link> <span>/</span>{" "}
-        <Link to={`/categorie/${product.category}`}>{product.category}</Link>{" "}
+        <Link to={`/categorie/${product.category}`}>{categoryName}</Link>{" "}
         <span>/</span> <span>{product.name}</span>
       </nav>
 
       <div className="pdp__grid">
         <div className="pdp__gallery">
           <div className="pdp__main-img">
-            <img src={images[activeImg]} alt={product.name} />
+            <Img
+              src={images[activeImg]}
+              alt={product.name}
+              cdnWidth={800}
+              loading="eager"
+            />
           </div>
           {images.length > 1 && (
             <div className="pdp__thumbs">
@@ -72,7 +131,7 @@ export default function ProductDetail() {
                   className={i === activeImg ? "is-active" : ""}
                   onClick={() => setActiveImg(i)}
                 >
-                  <img src={src} alt={`${product.name} ${i + 1}`} />
+                  <Img src={src} alt={`${product.name} ${i + 1}`} cdnWidth={160} />
                 </button>
               ))}
             </div>

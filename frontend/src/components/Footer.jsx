@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer__grid">
         <div>
-          <h3 className="footer__logo">{SITE.name}</h3>
+          <img src="/logo.jpeg" alt={SITE.name} className="footer__logo-img" />
           <p>{SITE.tagline}</p>
           <p className="footer__muted">{SITE.city}</p>
         </div>
@@ -44,6 +44,11 @@ export default function Footer() {
                 rel="noreferrer"
               >
                 Commander sur WhatsApp
+              </a>
+            </li>
+            <li>
+              <a href={SITE.instagram} target="_blank" rel="noreferrer">
+                📷 Instagram
               </a>
             </li>
           </ul>
