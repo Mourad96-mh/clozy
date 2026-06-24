@@ -1,0 +1,18 @@
+# SPA fallback for client-only routes (e.g. /admin, /commande).
+# Prerendered routes already have their own index.html and are served directly.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  # If the requested file or directory exists, serve it as-is.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  # Otherwise hand off to the SPA entry point.
+  RewriteRule ^ /index.html [L]
+</IfModule>
+
+# Force HTTPS (Hostinger serves both; keep canonical on https).
+<IfModule mod_rewrite.c>
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>

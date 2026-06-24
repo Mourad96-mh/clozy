@@ -7,15 +7,36 @@ const Admin = require('./models/Admin')
 const app = express()
 
 // ── Middleware ────────────────────────────────────────────────
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
-]
+// Construit la liste blanche : localhost (dev) + FRONTEND_URL, en autorisant
+// automatiquement les variantes www / non-www (ex: vetementshiba.com et
+// www.vetementshiba.com) pour éviter les blocages CORS selon le domaine servi.
+function buildAllowedOrigins() {
+  const origins = ['http://localhost:5173', 'http://localhost:3000']
+  const front = process.env.FRONTEND_URL
+  if (front) {
+    const clean = front.replace(/\/$/, '') // sans slash final
+    origins.push(clean)
+    try {
+      const u = new URL(clean)
+      const host = u.host.replace(/^www\./, '')
+      origins.push(`${u.protocol}//${host}`)
+      origins.push(`${u.protocol}//www.${host}`)
+    } catch (_) {
+      // FRONTEND_URL mal formé : on garde au moins la valeur brute.
+    }
+  }
+  return [...new Set(origins)]
+}
+
+const allowedOrigins = buildAllowedOrigins()
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    // Autorise aussi les requêtes sans Origin (curl, health checks).
+    origin: (origin, cb) =>
+      !origin || allowedOrigins.includes(origin)
+        ? cb(null, true)
+        : cb(new Error(`Origin non autorisée par CORS : ${origin}`)),
     credentials: true,
   })
 )
