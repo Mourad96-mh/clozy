@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useParams, useSearchParams, Link, Navigate, useLoaderData } from "react-router-dom";
 import { api } from "../api";
 import { getCategory, getSubcategory } from "../data/products";
@@ -22,7 +23,26 @@ export default function Category() {
   const { slug, sub = "" } = useParams();
   const [searchParams] = useSearchParams();
   const category = getCategory(slug);
-  const products = useLoaderData() || [];
+
+  // Le HTML statique date du build. On part des données prérendues (bonnes pour
+  // le SEO / le 1er rendu) puis on revalide depuis l'API au montage afin de
+  // refléter les modifs admin (prix, stock, nouveaux produits) sans rebuild.
+  const [products, setProducts] = useState(useLoaderData() || []);
+
+  useEffect(() => {
+    let alive = true;
+    const query = { category: slug };
+    if (sub) query.subcategory = sub;
+    api
+      .getProducts(query)
+      .then((d) => {
+        if (alive) setProducts(d.products || []);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [slug, sub]);
 
   // Rétro-compatibilité : ancienne URL /categorie/femme?sub=pyjamas → nouveau chemin.
   const legacySub = searchParams.get("sub");

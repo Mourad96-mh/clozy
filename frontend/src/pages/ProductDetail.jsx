@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useLoaderData } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLoaderData, useParams } from "react-router-dom";
 import { api, finalPrice } from "../api";
 import { SITE } from "../data/config";
 import { getCategory } from "../data/products";
@@ -18,7 +18,10 @@ export async function productLoader({ params }) {
 }
 
 export default function ProductDetail() {
-  const product = useLoaderData();
+  const { idOrSlug } = useParams();
+  // Données prérendues (bonnes pour le SEO / 1er rendu) puis revalidées côté
+  // client au montage : reflète les modifs admin (prix, stock…) sans rebuild.
+  const [product, setProduct] = useState(useLoaderData());
   const { add } = useCart();
 
   const [activeImg, setActiveImg] = useState(0);
@@ -26,6 +29,23 @@ export default function ProductDetail() {
   const [color, setColor] = useState(product?.colors?.[0] || "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    api
+      .getProduct(idOrSlug)
+      .then((fresh) => {
+        if (!alive || !fresh) return;
+        setProduct(fresh);
+        // Garder une taille/couleur valide si les options ont changé.
+        setSize((s) => (fresh.sizes?.includes(s) ? s : fresh.sizes?.[0] || ""));
+        setColor((c) => (fresh.colors?.includes(c) ? c : fresh.colors?.[0] || ""));
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [idOrSlug]);
 
   if (!product)
     return (
