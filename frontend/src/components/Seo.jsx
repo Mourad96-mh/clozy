@@ -1,23 +1,31 @@
 import { Head } from "vite-react-ssg";
 import { SITE } from "../data/config";
+import { withLocale, dirFor, htmlLangFor, ogLocaleFor } from "../data/i18n";
 
-// Métadonnées par page : <title>, description, canonical, Open Graph, Twitter.
+// Métadonnées par page : <title>, description, canonical, Open Graph, Twitter,
+// langue/direction du document et alternates hreflang (FR/AR).
 // `children` permet d'injecter du JSON-LD (<script type="application/ld+json">).
 //
-//   path      chemin absolu de la page (ex: "/categorie/femme/pyjamas")
-//   image     URL d'image OG (relative au site ou absolue)
-//   type      "website" (défaut) ou "product"
-//   noindex   true pour exclure la page de l'indexation
+//   path        chemin NEUTRE de la page sans préfixe de langue (ex: "/categorie/femme")
+//   locale      "fr" (défaut) ou "ar" — la version arabe est servie sous "/ar"
+//   bilingual   true => émet les liens hreflang FR ↔ AR ↔ x-default
+//   image       URL d'image OG (relative au site ou absolue)
+//   type        "website" (défaut) ou "product"
+//   noindex     true pour exclure la page de l'indexation
 export default function Seo({
   title,
   description,
-  path = "",
+  path = "/",
+  locale = "fr",
+  bilingual = false,
   image,
   type = "website",
   noindex = false,
   children,
 }) {
-  const url = SITE.origin + path;
+  const url = SITE.origin + withLocale(path, locale);
+  const frUrl = SITE.origin + withLocale(path, "fr");
+  const arUrl = SITE.origin + withLocale(path, "ar");
   const ogImage = image
     ? image.startsWith("http")
       ? image
@@ -26,6 +34,8 @@ export default function Seo({
 
   return (
     <Head>
+      <html lang={htmlLangFor(locale)} dir={dirFor(locale)} />
+
       <title>{title}</title>
       {description && <meta name="description" content={description} />}
       <link rel="canonical" href={url} />
@@ -35,6 +45,11 @@ export default function Seo({
         <meta name="robots" content="index,follow" />
       )}
 
+      {/* hreflang : versions linguistiques alternatives (pages bilingues) */}
+      {bilingual && <link rel="alternate" hrefLang="fr-MA" href={frUrl} />}
+      {bilingual && <link rel="alternate" hrefLang="ar-MA" href={arUrl} />}
+      {bilingual && <link rel="alternate" hrefLang="x-default" href={frUrl} />}
+
       {/* Open Graph */}
       <meta property="og:site_name" content={SITE.name} />
       <meta property="og:title" content={title} />
@@ -42,7 +57,13 @@ export default function Seo({
       <meta property="og:type" content={type} />
       <meta property="og:url" content={url} />
       <meta property="og:image" content={ogImage} />
-      <meta property="og:locale" content="fr_MA" />
+      <meta property="og:locale" content={ogLocaleFor(locale)} />
+      {bilingual && (
+        <meta
+          property="og:locale:alternate"
+          content={ogLocaleFor(locale === "ar" ? "fr" : "ar")}
+        />
+      )}
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />

@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 import CartDrawer from "../components/CartDrawer.jsx";
+import FloatingContact from "../components/FloatingContact.jsx";
 
 // Habillage de la boutique : barre de navigation, tiroir panier, pied de page.
 export default function StorefrontLayout() {
@@ -15,6 +16,7 @@ export default function StorefrontLayout() {
         <Outlet />
       </main>
       <Footer />
+      <FloatingContact />
     </>
   );
 }

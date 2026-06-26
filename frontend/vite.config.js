@@ -38,9 +38,11 @@ export default defineConfig({
       const productPaths = (await fetchProductSlugs()).map(
         (slug) => `/produit/${slug}`
       );
-      // Accueil + catégories + sous-catégories + fiches produits.
-      // Exclus volontairement : /admin/*, /commande, 404.
-      return ["/", ...categoryPaths, ...productPaths];
+      // Versions arabes (RTL) des pages vitrine, servies sous "/ar".
+      const arPaths = ["/ar", "/ar/vente-en-gros", ...categoryPaths.map((p) => "/ar" + p)];
+      // Accueil + catégories + sous-catégories + fiches produits + vente en gros
+      // (FR) + leurs équivalents arabes. Exclus : /admin/*, /commande, 404.
+      return ["/", "/vente-en-gros", ...categoryPaths, ...productPaths, ...arPaths];
     },
   },
 });

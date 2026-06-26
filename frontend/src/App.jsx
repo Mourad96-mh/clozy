@@ -7,6 +7,7 @@ import Home from "./pages/Home.jsx";
 import Category, { categoryLoader } from "./pages/Category.jsx";
 import ProductDetail, { productLoader } from "./pages/ProductDetail.jsx";
 import Checkout from "./pages/Checkout.jsx";
+import VenteEnGros from "./pages/VenteEnGros.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 import ProtectedRoute from "./components/admin/ProtectedRoute.jsx";
@@ -31,7 +32,21 @@ export const routes = [
           { path: "categorie/:slug", element: <Category />, loader: categoryLoader },
           { path: "categorie/:slug/:sub", element: <Category />, loader: categoryLoader },
           { path: "produit/:idOrSlug", element: <ProductDetail />, loader: productLoader },
+          { path: "vente-en-gros", element: <VenteEnGros /> },
           { path: "commande", element: <Checkout /> },
+        ],
+      },
+
+      // ── Boutique en arabe (RTL, préfixe /ar) ─────────────────
+      // Pages vitrine bilingues uniquement (les fiches produits restent en FR).
+      {
+        path: "ar",
+        element: <StorefrontLayout />,
+        children: [
+          { index: true, element: <Home /> },
+          { path: "categorie/:slug", element: <Category />, loader: categoryLoader },
+          { path: "categorie/:slug/:sub", element: <Category />, loader: categoryLoader },
+          { path: "vente-en-gros", element: <VenteEnGros /> },
         ],
       },
 

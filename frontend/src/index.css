@@ -94,6 +94,46 @@ h1, h2, h3, h4 { line-height: 1.2; }
   background-repeat: no-repeat;
 }
 .hero__inner { padding: 96px 20px; }
+
+/* Hero "stock" de la page Vente en gros : mur de produits en fond + voile lisible */
+.hero--gros {
+  position: relative;
+  overflow: hidden;
+  background: #fbeef1;
+}
+.hero__collage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-auto-rows: 1fr;
+  z-index: 0;
+}
+.hero__collage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Voile par-dessus le mur de produits pour garder le texte parfaitement lisible */
+.hero--gros::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(100deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 255, 255, 0.9) 42%, rgba(255, 255, 255, 0.62) 66%, rgba(251, 238, 241, 0.55) 100%);
+}
+.hero--gros .hero__inner {
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 760px) {
+  .hero__collage { grid-template-columns: repeat(5, 1fr); }
+  .hero--gros::before {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.95) 0%, rgba(251, 238, 241, 0.92) 100%);
+  }
+}
 .hero__text { max-width: 620px; }
 .hero__eyebrow { color: var(--brand); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; }
 .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 8px 0 12px; }
@@ -277,6 +317,183 @@ h1, h2, h3, h4 { line-height: 1.2; }
 .faq-item { border-top: 1px solid var(--line, #eee); padding: 16px 0; }
 .faq-item dt { font-weight: 600; margin-bottom: 6px; }
 .faq-item dd { margin: 0; color: var(--muted, #555); line-height: 1.6; }
+
+/* FAQ en <details> (page Vente en gros) */
+.faq { margin: 8px 0 0; }
+.faq__item { border-top: 1px solid var(--line, #eee); padding: 14px 0; }
+.faq__item summary { font-weight: 600; cursor: pointer; list-style: none; }
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary::after { content: " +"; color: var(--muted, #999); }
+.faq__item[open] summary::after { content: " –"; }
+.faq__item p { margin: 8px 0 0; color: var(--muted, #555); line-height: 1.6; }
+
+/* Tuiles illustrées "Quels vêtements en gros ?" (page Vente en gros) */
+.gros-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.gros-tile {
+  position: relative;
+  display: block;
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: var(--line, #eee);
+}
+.gros-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 0.25s ease;
+}
+.gros-tile:hover img { transform: scale(1.05); }
+.gros-tile__label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 26px 16px 14px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+}
+@media (max-width: 760px) {
+  .gros-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 460px) {
+  .gros-grid { grid-template-columns: 1fr; }
+}
+
+/* Boutons flottants de contact (bas-droite) : WhatsApp + appel */
+.fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.fab__btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.fab__btn:hover { transform: scale(1.08); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3); }
+.fab__btn--wa { background: #25d366; }
+.fab__btn--tel { background: var(--brand, #b5838d); }
+@media (max-width: 600px) {
+  .fab { right: 14px; bottom: 14px; gap: 10px; }
+  .fab__btn { width: 50px; height: 50px; }
+}
+
+/* ── Contenu éditorial accueil (SEO) ──────────────────────── */
+.home-intro p { max-width: 880px; color: var(--muted, #555); line-height: 1.8; }
+.univers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.univers-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid var(--line, #eee);
+  border-radius: var(--radius);
+  background: #fff;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+.univers-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+  border-color: var(--brand, #b5838d);
+}
+.univers-card__title { font-weight: 800; color: var(--ink, #2a2a2a); }
+.univers-card__desc { font-size: 0.9rem; color: var(--muted, #666); line-height: 1.5; }
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.why-card { padding: 18px; border-radius: var(--radius); background: #faf4f6; }
+.why-card h3 { margin: 0 0 6px; font-size: 1rem; }
+.why-card p { margin: 0; color: var(--muted, #555); line-height: 1.6; font-size: 0.92rem; }
+.seo-outro { max-width: 920px; color: var(--muted, #777); line-height: 1.8; font-size: 0.95rem; }
+@media (max-width: 900px) {
+  .univers-grid { grid-template-columns: repeat(2, 1fr); }
+  .why-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .univers-grid, .why-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Arabe / RTL ──────────────────────────────────────────── */
+/* Interrupteur de langue FR / ع — aligné verticalement avec les liens du menu */
+.navbar__item--lang { display: flex; align-items: center; }
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line, #e6dcdc);
+  border-radius: 999px;
+  overflow: hidden;
+  background: #fff;
+}
+.lang-switch__opt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  padding: 5px 10px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  line-height: 1;
+  color: var(--muted, #8a8a8a);
+}
+.lang-switch__opt + .lang-switch__opt { border-inline-start: 1px solid var(--line, #e6dcdc); }
+.lang-switch__opt.is-active { background: var(--brand); color: #fff; }
+.lang-switch__opt:hover:not(.is-active) { color: var(--brand); }
+@media (max-width: 760px) {
+  /* Dans le menu vertical, on aligne l'interrupteur sur le padding des liens */
+  .navbar__item--lang { padding: 8px 12px; }
+}
+[dir="rtl"] {
+  text-align: right;
+  font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", "Geeza Pro", system-ui, sans-serif;
+}
+/* Les flex (nav, chips, crumbs, perks, cta) se reflètent seuls grâce à dir=rtl ;
+   on ne corrige que les fonds dégradés directionnels. */
+[dir="rtl"] .hero {
+  background-position: center left;
+  background-image:
+    linear-gradient(260deg, rgba(255, 255, 255, 0.92) 32%, rgba(255, 255, 255, 0.45) 60%, rgba(246, 231, 238, 0.25) 100%),
+    url("/hero.svg");
+}
+[dir="rtl"] .hero--gros::before {
+  background:
+    linear-gradient(260deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 255, 255, 0.9) 42%, rgba(255, 255, 255, 0.62) 66%, rgba(251, 238, 241, 0.55) 100%);
+}
+@media (max-width: 760px) {
+  [dir="rtl"] .hero--gros::before {
+    background: linear-gradient(200deg, rgba(255, 255, 255, 0.95) 0%, rgba(251, 238, 241, 0.92) 100%);
+  }
+}
+/* En RTL, on place les boutons flottants en bas-gauche */
+[dir="rtl"] .fab { right: auto; left: 18px; }
+@media (max-width: 600px) {
+  [dir="rtl"] .fab { left: 14px; }
+}
 
 /* <picture> ne doit pas créer de boîte : l'<img> garde la mise en page d'origine */
 picture { display: contents; }
