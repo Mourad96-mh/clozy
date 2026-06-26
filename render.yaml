@@ -1,10 +1,10 @@
-# Render Blueprint — déploiement de l'API Clozy
+# Render Blueprint — déploiement de l'API Vêtements Hiba
 # Render → New + → Blueprint → sélectionner ce repo. Render lira ce fichier.
 # Les variables `sync: false` doivent être renseignées dans le dashboard
 # (ce sont des secrets, jamais commités).
 services:
   - type: web
-    name: clozy-api
+    name: vetementshiba-backend
     runtime: node
     rootDir: backend
     plan: free
